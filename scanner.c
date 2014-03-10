@@ -15,6 +15,7 @@
  return types for functions with ???.
  ******************/
 
+//need to dertermine returns
 static char get_char();
 static ??? skip_comment(???);
 static ??? skip_blanks(???);
@@ -145,11 +146,12 @@ static ??? get_word(char *currLine)
     /*
      Write some code to Extract the word
     */
-    char *e=strchr(currLine, ' ');
-    int index=(int)(e-currLine);
+
+    //This first part might go into token, not sure
+    char *en=strchr(currLine, ' ');
+    int index=(int)(en-currLine);
     char *foundWord;    //foundWord is the extracted word
     strncpy(foundWord, currLine, index);    //makes a substring from 0 to the index of the space
-
 
     //Downshift the word, to make it lower case
     foundWord=downshift_word(foundWord); //send foundWord to downshift_word and overwrite foundWord to the lowercase
@@ -159,25 +161,56 @@ static ??? get_word(char *currLine)
      if it is not a reserved word its an identifier.
     */
     if(is_reserved_word(foundWord)==FALSE){
+        //needs body
         //it's an identifier
-        //return something      PERHAPS STRING foundWord
+        //return something      PERHAPS pointer foundWord
     }else{
         //it's reserved
-        //return something      PERHAPS STRING foundWord
+        //return something      PERHAPS pointer foundWord
     }
 }
 
-static ??? get_number(???)
+//I think this is done?
+static double get_number(char *currLine)
 {
     /*
      Write some code to Extract the number and convert it to a literal number.
     */
+
+    //This first part might go into token, not sure
+    char *en=strchr(currLine, ' ');
+    int index=(int)(en-currLine);
+    char *foundNum;    //foundWord is the extracted word
+    strncpy(foundNum, currLine, index);    //makes a substring from 0 to the index of the space
+
+    double d;       //set up the double variable
+    char *Ptr;      //declare the Pointer where d is saved to
+
+    d=strtod(foundNum, &Ptr);       //put the value at Ptr to the variable d
+
+    return d;       //return the double
+
 }
-static ??? get_string(???)
+
+//I think this is done?
+static char * get_string(char *currLine)
 {
     /*
      Write some code to Extract the string
     */
+    char *first=strchr(currLine, '\"');
+    int index=(int)(first-currLine);
+    printf("%d\n",index);
+    char *second=strchr(currLine+index+1, '\"');
+    int index2=(int)(second-currLine);
+    printf("%d\n",index2);
+
+    char *theString;
+    strncpy(theString, currLine+index+1, index2-index);
+    theString[index2-index-1]='\0';
+
+    return theString;
+
 }
 static ??? get_special(???)
 {
@@ -187,18 +220,23 @@ static ??? get_special(???)
     */
 }
 
-//Need to change sentWordPtr to an array
+//It's done. However, The puts needs to be there for some reason I dont understand
 static char * downshift_word(char *sentWordPtr)
 {
     /*
      Make all of the characters in the incoming word lower case.
     */
-    int i = 0;;
-    int size=sizeof(sentWord);
-    for(i; i!=NULL; i++){
-        sentWord[i] = tolower(sentWord[i]);
+    char cr[MAX_SOURCE_LINE_LENGTH];    //make an array
+    int i=0;
+    while(*sentWordPtr!=NULL){          //while the character in the string is not \0
+        cr[i]=tolower(*sentWordPtr);    //build the array of lowercase characters
+        ++i;
+        ++sentWordPtr;
     }
-    return sentWord;
+    cr[i]='\0';                         //null character to the end of the array
+    sentWordPtr=cr;                     //sentWordPtr is set to the position of the new array
+    puts(sentWordPtr);                  //IDK why, but it is here
+    return sentWordPtr;                 //return the pointer
 }
 static BOOLEAN is_reserved_word(???)
 {
