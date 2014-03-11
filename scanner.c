@@ -98,7 +98,7 @@ Token* get_token()
 
     char ch; //This can be the current character you are examining during scanning.
     char token_string[MAX_TOKEN_STRING_LENGTH]; //Store your token here as you build it.
-    char *token_ptr = ???; //write some code to point this to the beginning of token_string
+    char *token_ptr = &token_string; //write some code to point this to the beginning of token_string
     ???;  //I am missing the most important variable in the function, what is it?  Hint: what should I return?
 
     //1.  Skip past all of the blanks
@@ -151,16 +151,25 @@ static ??? get_word(char *currLine)
     char *en=strchr(currLine, ' ');
     int index=(int)(en-currLine);
     char *foundWord;    //foundWord is the extracted word
-    strncpy(foundWord, currLine, index);    //makes a substring from 0 to the index of the space
-
+    foundWord=(char*)malloc(index+1);
+    memcpy(foundWord, currLine, index);    //makes a substring from 0 to the index of the space
+    foundWord[index]='\0';
     //Downshift the word, to make it lower case
-    foundWord=downshift_word(foundWord); //send foundWord to downshift_word and overwrite foundWord to the lowercase
+
+    char *e=strchr(foundWord, '\0');
+    int length=(int)(e-foundWord);
+    char* lower;
+    lower=(char*)malloc(length+1);
+    memcpy(lower, foundWord, length);    //makes a substring from 0 to the index of the space
+    theThing[length]='\0';
+
+    downshift_word(lower); //send foundWord to downshift_word and overwrite foundWord to the lowercase
 
     /*
      Write some code to Check if the word is a reserved word.
      if it is not a reserved word its an identifier.
     */
-    if(is_reserved_word(foundWord)==FALSE){
+    if(is_reserved_word(lower)==FALSE){
         //needs body
         //it's an identifier
         //return something      PERHAPS pointer foundWord
@@ -180,8 +189,10 @@ static double get_number(char *currLine)
     //This first part might go into token, not sure
     char *en=strchr(currLine, ' ');
     int index=(int)(en-currLine);
-    char *foundNum;    //foundWord is the extracted word
-    strncpy(foundNum, currLine, index);    //makes a substring from 0 to the index of the space
+    char *foundNum=0;    //foundWord is the extracted word
+    foundNum=(char*)malloc(index+1);
+    memcpy(foundNum, currLine, index);    //makes a substring from 0 to the index of the space
+    foundNum[index]='\0';
 
     double d;       //set up the double variable
     char *Ptr;      //declare the Pointer where d is saved to
@@ -205,9 +216,10 @@ static char * get_string(char *currLine)
     int index2=(int)(second-currLine);
     printf("%d\n",index2);
 
-    char *theString;
-    strncpy(theString, currLine+index+1, index2-index);
-    theString[index2-index-1]='\0';
+    char *theString=0;
+    theString=(char*)malloc(index2-index);
+    memcpy(theString, currLine+index+1, index2-index-1);
+    theString[index2-index]='\0';
 
     return theString;
 
@@ -221,22 +233,24 @@ static ??? get_special(???)
 }
 
 //It's done. However, The puts needs to be there for some reason I dont understand
-static char * downshift_word(char *sentWordPtr)
+static void downshift_word(char *sentWordPtr)
 {
     /*
      Make all of the characters in the incoming word lower case.
     */
-    char cr[MAX_SOURCE_LINE_LENGTH];    //make an array
+    char *en=strchr(sentWordPtr, '\0');
+    int length=(int)(en-sentWordPtr);
+    char cr[length+1];    //make an array
     int i=0;
-    while(*sentWordPtr!=NULL){          //while the character in the string is not \0
+    while(*sentWordPtr!='\0'){          //while the character in the string is not \0
         cr[i]=tolower(*sentWordPtr);    //build the array of lowercase characters
         ++i;
         ++sentWordPtr;
     }
-    cr[i]='\0';                         //null character to the end of the array
-    sentWordPtr=cr;                     //sentWordPtr is set to the position of the new array
-    puts(sentWordPtr);                  //IDK why, but it is here
-    return sentWordPtr;                 //return the pointer
+    cr[length]='\0';                         //null character to the end of the array
+    //puts(cr);                  //IDK why, but it is here
+    sentWordPtr=sentWordPtr-52;
+    memcpy(sentWordPtr, cr, length);
 }
 static BOOLEAN is_reserved_word(???)
 {
