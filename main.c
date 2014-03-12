@@ -32,7 +32,7 @@ int main(int argc, const char * argv[])
         add_token_to_list(token_list, token);
         print_token(token);
     }
-    while (???);//What is the sentinal value that ends this loop?
+    while (token != NULL);//What is the sentinal value that ends this loop?
 
     quit_scanner(source_file, token_list);
 
@@ -45,7 +45,8 @@ void add_token_to_list(Token *list, Token *new_token)
 void quit_scanner(FILE *src_file, Token *list)
 {
     //write code to free all of the memory for the token list
-
+    
+    free (list);
     fclose(src_file);
 }
 FILE *init_lister(const char *name, char source_file_name[], char dte[])
