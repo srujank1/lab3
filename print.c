@@ -60,8 +60,7 @@ void print_token(Token *token)
 {
     //print_token() will print the token on its own line and will symbol_string
     //value followed by literal value (if it’s a literal) or a symbol or keyword
-
-
-    printf("%s\t%s", token->literal_value, token->token_code);
+    //printf("%s\t%s", token->literal_value, token->token_code);
+    printf("%s%s\t%s", SYMBOL_STRINGS, token->literal_value, token->token_code);
 
 }
