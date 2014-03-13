@@ -60,13 +60,14 @@ LiteralType;
  ***************/
  
  
-typedef struct
+ttypedef struct 
 {
-    char* literal_value;
+    char *literal_value;
     TokenCode token_code;
     LiteralType literal_type;
-    Token *next;
-    // i think this is right;
+
+    struct Token *next;
+    // I think this is right now;
 }
 Token;
 
