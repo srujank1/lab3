@@ -17,14 +17,14 @@
 
 //need to dertermine returns
 static char get_char();
-static ??? skip_comment(???);
-static ??? skip_blanks(???);
-static ??? get_word(???);
-static ??? get_number(???);
-static ??? get_string(???);
+static void skip_comment(char* line);
+static void skip_blanks(char* line);
+static ??? get_word(???); //still need to work this out
+static double get_number(char* currLine);
+static char* get_string(char* currLine);
 static ??? get_special(???);
-static ??? downshift_word(???);
-static BOOLEAN is_reserved_word(???);
+static void downshift_word(char* lower);
+static BOOLEAN is_reserved_word(char* sentWord);
 
 typedef enum
 {
@@ -99,16 +99,18 @@ Token* get_token()
     char ch; //This can be the current character you are examining during scanning.
     char token_string[MAX_TOKEN_STRING_LENGTH]; //Store your token here as you build it.
     char *token_ptr = &token_string; //write some code to point this to the beginning of token_string
-    ???;  //I am missing the most important variable in the function, what is it?  Hint: what should I return?
-
+    //I am missing the most important variable in the function, what is it?  Hint: what should I return?
+    Token tk;
     //1.  Skip past all of the blanks
+    token_ptr=skip_blanks(token_ptr);
     //2.  figure out which case you are dealing with LETTER, DIGIT, QUOTE, EOF, or special, by examining ch
+    ch=getchar();
     //3.  Call the appropriate function to deal with the cases in 2.
 
-    return ???; //What should be returned here?
+    return tk; //What should be returned here?
 }
 
-
+//I need to figure out what is being passsed to this
 static char get_char(char *currLine)
 {
     /*
@@ -116,28 +118,44 @@ static char get_char(char *currLine)
      we should call get source line.  If at the EOF (end of file) we should
      set the character ch to EOF and leave the function.
      */
+     if(currLine[0]=='\0'){
+        if(get_source_line(currLine)==FALSE){
+            return EOF;
+        }
+     }
 
     /*
      Write some code to set the character ch to the next character in the buffer
      */
+
+     ++currLine;
+
+     return currLine[0];
 }
 
-static ??? skip_blanks(???)
+//done
+static void skip_blanks(char* line)
 {
     /*
      Write some code to skip past the blanks in the program and return a pointer
      to the first non blank character
     */
-
+    while(line[0]==' '){
+        ++line;
+    }
 
 }
 
-static ??? skip_comment(???)
+//done
+static void skip_comment(char* line)
 {
     /*
      Write some code to skip past the comments in the program and return a pointer
      to the first non blank character.  Watch out for the EOF character.
     */
+    while(line[i]!='}'){
+        ++line;
+    }
 }
 
 //needs a return. What is it?
@@ -146,14 +164,13 @@ static ??? get_word(char *currLine)
     /*
      Write some code to Extract the word
     */
-
-    //This first part might go into token, not sure
     char *en=strchr(currLine, ' ');
     int index=(int)(en-currLine);
     char *foundWord;    //foundWord is the extracted word
     foundWord=(char*)malloc(index+1);
     memcpy(foundWord, currLine, index);    //makes a substring from 0 to the index of the space
     foundWord[index]='\0';
+
     //Downshift the word, to make it lower case
 
     char *e=strchr(foundWord, '\0');
@@ -161,7 +178,7 @@ static ??? get_word(char *currLine)
     char* lower;
     lower=(char*)malloc(length+1);
     memcpy(lower, foundWord, length);    //makes a substring from 0 to the index of the space
-    theThing[length]='\0';
+    lower[length]='\0';
 
     downshift_word(lower); //send foundWord to downshift_word and overwrite foundWord to the lowercase
 
@@ -185,8 +202,6 @@ static double get_number(char *currLine)
     /*
      Write some code to Extract the number and convert it to a literal number.
     */
-
-    //This first part might go into token, not sure
     char *en=strchr(currLine, ' ');
     int index=(int)(en-currLine);
     char *foundNum=0;    //foundWord is the extracted word
@@ -203,8 +218,8 @@ static double get_number(char *currLine)
 
 }
 
-//I think this is done?
-static char * get_string(char *currLine)
+//I think this is done
+static char* get_string(char *currLine)
 {
     /*
      Write some code to Extract the string
@@ -252,7 +267,7 @@ static void downshift_word(char *sentWordPtr)
     sentWordPtr=sentWordPtr-52;
     memcpy(sentWordPtr, cr, length);
 }
-static BOOLEAN is_reserved_word(???)
+static BOOLEAN is_reserved_word(char* sentWord)
 {
     /*
      Examine the reserved word table and determine if the function input is a reserved word.
