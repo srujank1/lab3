@@ -58,5 +58,11 @@ static void print_page_header(char source_name[], char date[])
 }
 void print_token(Token *token)
 {
-    //Missing code goes here
+ 
+    //print_token() will print the token on its own line and will symbol_string
+    //value followed by literal value (if it’s a literal) or a symbol or keyword
+    
+    printf("%s%s\t%s", SYMBOL_STRINGS, token->literal_value, token->token_code);
+
+
 }
