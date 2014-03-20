@@ -28,13 +28,13 @@ void print_line(char line[], char source_name_to_print[], char date_to_print[])
     char save_ch;
     char *save_chp = NULL;
     static int line_count = MAX_LINES_PER_PAGE;
-    
+
     if (++line_count > MAX_LINES_PER_PAGE)
     {
         print_page_header(source_name_to_print, date_to_print);
         line_count = 1;
     }
-    if (strlen(line) > MAX_PRINT_LINE_LENGTH) 
+    if (strlen(line) > MAX_PRINT_LINE_LENGTH)
     {
         save_chp = &line[MAX_PRINT_LINE_LENGTH];
     }
@@ -52,16 +52,17 @@ void print_line(char line[], char source_name_to_print[], char date_to_print[])
 static void print_page_header(char source_name[], char date[])
 {
     static int page_number = 0;
-    
+
     putchar(FORM_FEED_CHAR);
     printf("Page    %d  %s  %s\n\n", ++page_number, source_name, date);
 }
 void print_token(Token *token)
 {
+
     //print_token() will print the token on its own line and will symbol_string
     //value followed by literal value (if it’s a literal) or a symbol or keyword
 
-    printf(">> %s\t%s", SYMBOL_STRINGS[token->token_code], token->literal_type);
+    printf("%s%s\t%s", SYMBOL_STRINGS, token->literal_value, token->token_code);
 
 
 }
