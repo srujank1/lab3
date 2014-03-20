@@ -104,7 +104,6 @@ Token* get_token()
     char *token_ptr = &token_string; //write some code to point this to the beginning of token_string
     //I am missing the most important variable in the function, what is it?  Hint: what should I return?
     Token* tk=(Token*)malloc(sizeof(Token));
-
     RwStruct w;
 
     //1.  Skip past all of the blanks
@@ -132,37 +131,38 @@ Token* get_token()
         if(is_reserved_word(token_ptr)){
             //tk.literal_type=LiteralType
             int i=0;
-            w=rw_table[strlen(sentWord)+1][0];
+            w=rw_table[strlen(token_ptr)+1][0];
             while(w.string!=NULL){
-                if(strcmp(w.string, sentWord)==0){
-                    tk.tokenCode=w.token_code;
+                if(strcmp(w.string, token_ptr)==0){
+                    w.token_code;
+                    tk.token_code=w.token_code;
                 }
 
             ++i;
-            w=rw_table[strlen(sentWord)-2][i];
+            w=rw_table[strlen(token_ptr)-2][i];
             }
         }else{
             //tk.literal_type=LiteralType.REAL_LIT;
-            tk.token_code=TokenCode.IDENTIFIER;
+            tk.token_code=IDENTIFIER;
         }
 
     }else if (isdigit(ch)) {
         token_ptr=get_number(theSourceLine);
         tk->literal_value=token_ptr;
-        tk.literal_type=LiteralType.INTEGER_LIT;
-        tk.token_code=TokenCode.NUMBER;
+        tk.literal_type=INTEGER_LIT;
+        tk.token_code=NUMBER;
     }else if(ch=='"'){
         token_ptr=get_string(theSourceLine);
         tk->literal_value=token_ptr;
-        tk.literal_type=LiteralType.STRING_LIT
-        tk.token_code=TokenCode.STRING;
+        tk.literal_type=STRING_LIT;
+        tk.token_code=STRING;
     }else if(ch==EOF){
         //return something
     }else{
         token_ptr=get_special(theSourceLine);
         tk->literal_value=token_ptr;
-        tk.literal_type=LiteralType.REAL_LIT;
-        tk.token_code=TokenCode[token_ptr];
+        tk->literal_type=REAL_LIT;
+        tk->token_code=tc[token_ptr];
     }
 
 
