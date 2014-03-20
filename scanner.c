@@ -17,12 +17,12 @@
 
 //need to dertermine returns
 static char get_char();
-static void skip_comment(char* line);
-static void skip_blanks(char* line);
-static ??? get_word(???); //still need to work this out
-static double get_number(char* currLine);
-static char* get_string(char* currLine);
-static ??? get_special(???);
+static void skip_comment();
+static void skip_blanks();
+static char* get_word(); //still need to work this out
+static char* get_number();
+static char* get_string();
+static char* get_special();
 static void downshift_word(char* lower);
 static BOOLEAN is_reserved_word(char* sentWord);
 
@@ -40,6 +40,9 @@ static FILE *src_file;
 static char src_name[MAX_FILE_NAME_LENGTH];
 static char todays_date[DATE_STRING_LENGTH];
 static CharCode char_table[256];  // The character table
+
+static char* theSourceLine; //where to store the taken line
+
 
 typedef struct
 {
@@ -76,7 +79,7 @@ BOOLEAN get_source_line(char source_buffer[])
 {
 
     char print_buffer[MAX_SOURCE_LINE_LENGTH + 9];
-    char source_buffer[MAX_SOURCE_LINE_LENGTH];  //I've moved this to a function parameter.  Why did I do that?
+    //char source_buffer[MAX_SOURCE_LINE_LENGTH];  //I've moved this to a function parameter.  Why did I do that?
     static int line_number = 0;
 
     if (fgets(source_buffer, MAX_SOURCE_LINE_LENGTH, src_file) != NULL)
@@ -100,76 +103,138 @@ Token* get_token()
     char token_string[MAX_TOKEN_STRING_LENGTH]; //Store your token here as you build it.
     char *token_ptr = &token_string; //write some code to point this to the beginning of token_string
     //I am missing the most important variable in the function, what is it?  Hint: what should I return?
-    Token tk;
+    Token* tk=(Token*)malloc(sizeof(Token));
+
+    RwStruct w;
+
     //1.  Skip past all of the blanks
-    token_ptr=skip_blanks(token_ptr);
+    if(theSourceLine[0]=='\0'){
+        if(!get_source_line(theSourceLine)){
+            ch=EOF;
+        }
+    }
+
+    skip_blanks(theSourceLine);
+    ch=get_char(theSourceLine);
+
     //2.  figure out which case you are dealing with LETTER, DIGIT, QUOTE, EOF, or special, by examining ch
-    ch=getchar();
     //3.  Call the appropriate function to deal with the cases in 2.
+
+    if(ch=='{'){
+        skip_comment(theSourceLine);
+        skip_blanks(theSourceLine);
+        ch=get_char(theSourceLine);
+    }
+
+    if (isalpha(ch)) {
+        token_ptr=get_word(theSourceLine);
+        tk->literal_value=token_ptr;
+        if(is_reserved_word(token_ptr)){
+            //tk.literal_type=LiteralType
+            int i=0;
+            w=rw_table[strlen(sentWord)+1][0];
+            while(w.string!=NULL){
+                if(strcmp(w.string, sentWord)==0){
+                    tk.tokenCode=w.token_code;
+                }
+
+            ++i;
+            w=rw_table[strlen(sentWord)-2][i];
+            }
+        }else{
+            //tk.literal_type=LiteralType.REAL_LIT;
+            tk.token_code=TokenCode.IDENTIFIER;
+        }
+
+    }else if (isdigit(ch)) {
+        token_ptr=get_number(theSourceLine);
+        tk->literal_value=token_ptr;
+        tk.literal_type=LiteralType.INTEGER_LIT;
+        tk.token_code=TokenCode.NUMBER;
+    }else if(ch=='"'){
+        token_ptr=get_string(theSourceLine);
+        tk->literal_value=token_ptr;
+        tk.literal_type=LiteralType.STRING_LIT
+        tk.token_code=TokenCode.STRING;
+    }else if(ch==EOF){
+        //return something
+    }else{
+        token_ptr=get_special(theSourceLine);
+        tk->literal_value=token_ptr;
+        tk.literal_type=LiteralType.REAL_LIT;
+        tk.token_code=TokenCode[token_ptr];
+    }
+
+
+
+    tk->next=NULL;
 
     return tk; //What should be returned here?
 }
 
 //I need to figure out what is being passsed to this
-static char get_char(char *currLine)
+static char get_char()
 {
     /*
      If at the end of the current line (how do you check for that?),
      we should call get source line.  If at the EOF (end of file) we should
      set the character ch to EOF and leave the function.
      */
-     if(currLine[0]=='\0'){
-        if(get_source_line(currLine)==FALSE){
+     char c;
+     if(theSourceLine[0]=='\0'){
+        if(get_source_line(theSourceLine)==FALSE){
             return EOF;
         }
      }
+     c=theSourceLine[0];
 
     /*
      Write some code to set the character ch to the next character in the buffer
      */
 
-     ++currLine;
 
-     return currLine[0];
+     return c;
 }
 
 //done
-static void skip_blanks(char* line)
+static void skip_blanks()
 {
     /*
      Write some code to skip past the blanks in the program and return a pointer
      to the first non blank character
     */
-    while(line[0]==' '){
-        ++line;
+    while(theSourceLine[0]==' '){
+        ++theSourceLine;
     }
 
 }
 
 //done
-static void skip_comment(char* line)
+static void skip_comment()
 {
     /*
      Write some code to skip past the comments in the program and return a pointer
      to the first non blank character.  Watch out for the EOF character.
     */
-    while(line[i]!='}'){
-        ++line;
-    }
+    do{
+        ++theSourceLine;
+    }while(theSourceLine[0]!='}');
+    ++theSourceLine;
 }
 
 //needs a return. What is it?
-static ??? get_word(char *currLine)
+static char* get_word()
 {
     /*
      Write some code to Extract the word
     */
-    char *en=strchr(currLine, ' ');
-    int index=(int)(en-currLine);
+    char *en=strchrnul(theSourceLine, ' ');
+    int index=(int)(en-theSourceLine);
     char *foundWord;    //foundWord is the extracted word
     foundWord=(char*)malloc(index+1);
-    memcpy(foundWord, currLine, index);    //makes a substring from 0 to the index of the space
+    memcpy(foundWord, theSourceLine, index);    //makes a substring from 0 to the index of the space
     foundWord[index]='\0';
+    theSourceLine=theSourceLine+index;
 
     //Downshift the word, to make it lower case
 
@@ -186,68 +251,68 @@ static ??? get_word(char *currLine)
      Write some code to Check if the word is a reserved word.
      if it is not a reserved word its an identifier.
     */
-    if(is_reserved_word(lower)==FALSE){
-        //needs body
-        //it's an identifier
-        //return something      PERHAPS pointer foundWord
-    }else{
-        //it's reserved
-        //return something      PERHAPS pointer foundWord
-    }
+    free(foundWord);
+    return lower;
 }
 
 //I think this is done?
-static double get_number(char *currLine)
+static char* get_number()
 {
     /*
      Write some code to Extract the number and convert it to a literal number.
     */
-    char *en=strchr(currLine, ' ');
-    int index=(int)(en-currLine);
+    char *en=strchr(theSourceLine, ' ');
+    int index=(int)(en-theSourceLine);
     char *foundNum=0;    //foundWord is the extracted word
     foundNum=(char*)malloc(index+1);
-    memcpy(foundNum, currLine, index);    //makes a substring from 0 to the index of the space
+    memcpy(foundNum, theSourceLine, index);    //makes a substring from 0 to the index of the space
     foundNum[index]='\0';
+    theSourceLine=theSourceLine+index;
 
-    double d;       //set up the double variable
-    char *Ptr;      //declare the Pointer where d is saved to
-
-    d=strtod(foundNum, &Ptr);       //put the value at Ptr to the variable d
-
-    return d;       //return the double
+    return foundNum;       //return the string actually It could return d, I'm not sure
 
 }
 
 //I think this is done
-static char* get_string(char *currLine)
+static char* get_string()
 {
     /*
      Write some code to Extract the string
     */
-    char *first=strchr(currLine, '\"');
-    int index=(int)(first-currLine);
-    printf("%d\n",index);
-    char *second=strchr(currLine+index+1, '\"');
-    int index2=(int)(second-currLine);
-    printf("%d\n",index2);
+    char *first=strchrnul(theSourceLine, '\"');
+    int index=(int)(first-theSourceLine);
+    char *second=strchrnul(theSourceLine+index+1, '\"');
+    int index2=(int)(second-theSourceLine);
 
     char *theString=0;
     theString=(char*)malloc(index2-index);
-    memcpy(theString, currLine+index+1, index2-index-1);
+    memcpy(theString, theSourceLine+index+1, index2-index-1);
     theString[index2-index]='\0';
+    theSourceLine=theSourceLine+index2-index+1;
+
 
     return theString;
 
 }
-static ??? get_special(???)
+
+static char* get_special()
 {
     /*
      Write some code to Extract the special token.  Most are single-character
      some are double-character.  Set the token appropriately.
     */
+    char *en=strchrnul(theSourceLine, ' ');
+    int index=(int)(en-theSourceLine);
+    char *foundWord;    //foundWord is the extracted word
+    foundWord=(char*)malloc(index+1);
+    memcpy(foundWord, theSourceLine, index);    //makes a substring from 0 to the index of the space
+    foundWord[index]='\0';
+    theSourceLine=theSourceLine+index;
+
+    return foundWord;
 }
 
-//It's done. However, The puts needs to be there for some reason I dont understand
+//done
 static void downshift_word(char *sentWordPtr)
 {
     /*
@@ -263,15 +328,26 @@ static void downshift_word(char *sentWordPtr)
         ++sentWordPtr;
     }
     cr[length]='\0';                         //null character to the end of the array
-    //puts(cr);                  //IDK why, but it is here
-    sentWordPtr=sentWordPtr-52;
+    sentWordPtr=sentWordPtr-i;
     memcpy(sentWordPtr, cr, length);
 }
+
 static BOOLEAN is_reserved_word(char* sentWord)
 {
     /*
      Examine the reserved word table and determine if the function input is a reserved word.
     */
+    RwStruct w;
+    int i=0;
+    w=rw_table[strlen(sentWord)+1][0];
+    while(w.string!=NULL){
+        if(strcmp(w.string, sentWord)==0){
+            return TRUE;
+        }
+
+        ++i;
+        w=rw_table[strlen(sentWord)-2][i];
+    }
     return FALSE;
 }
 
