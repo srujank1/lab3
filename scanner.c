@@ -7,6 +7,7 @@
 //
 
 #include <stdio.h>
+#include <string.h>
 #include "scanner.h"
 
 /*******************
@@ -41,7 +42,8 @@ static char src_name[MAX_FILE_NAME_LENGTH];
 static char todays_date[DATE_STRING_LENGTH];
 static CharCode char_table[256];  // The character table
 
-static char* theSourceLine; //where to store the taken line
+static char *theSourceLine="";
+static char theSourceLineArray[MAX_SOURCE_LINE_LENGTH];
 
 
 typedef struct
@@ -75,17 +77,25 @@ void init_scanner(FILE *source_file, char source_name[], char date[])
      *******************/
 
 }
-BOOLEAN get_source_line(char source_buffer[])
+
+void initSourceLine(){
+theSourceLineArray[MAX_SOURCE_LINE_LENGTH];
+theSourceLine=theSourceLineArray;
+
+}
+
+BOOLEAN get_source_line()
 {
 
     char print_buffer[MAX_SOURCE_LINE_LENGTH + 9];
-    //char source_buffer[MAX_SOURCE_LINE_LENGTH];  //I've moved this to a function parameter.  Why did I do that?
+    //char source_buffer[MAX_SOURCE_LINE_LENGTH];
     static int line_number = 0;
 
-    if (fgets(source_buffer, MAX_SOURCE_LINE_LENGTH, src_file) != NULL)
+    if (fgets(theSourceLineArray, MAX_SOURCE_LINE_LENGTH, src_file) != NULL)
     {
+        initSourceLine();
         ++line_number;
-        sprintf(print_buffer, "%4d: %s", line_number, source_buffer);
+        sprintf(print_buffer, "%4d: %s", line_number, theSourceLine);
         print_line(print_buffer, src_name, todays_date);
         return (TRUE);
     }
@@ -105,10 +115,13 @@ Token* get_token()
     //I am missing the most important variable in the function, what is it?  Hint: what should I return?
     Token* tk=(Token*)malloc(sizeof(Token));
     RwStruct w;
+    //where to store the taken line
+
+    puts("ARE WE HERE?");
 
     //1.  Skip past all of the blanks
-    if(theSourceLine[0]=='\0'){
-        if(!get_source_line(theSourceLine)){
+    if(strlen(theSourceLine)<=1){
+        if(!get_source_line()){
             ch=EOF;
         }
     }
