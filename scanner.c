@@ -135,7 +135,7 @@ Token* get_token()
             while(w.string!=NULL){
                 if(strcmp(w.string, token_ptr)==0){
                     w.token_code;
-                    tk.token_code=w.token_code;
+                    tk->token_code=w.token_code;
                 }
 
             ++i;
@@ -143,29 +143,69 @@ Token* get_token()
             }
         }else{
             //tk.literal_type=LiteralType.REAL_LIT;
-            tk.token_code=IDENTIFIER;
+            tk->token_code=IDENTIFIER;
         }
 
     }else if (isdigit(ch)) {
         token_ptr=get_number(theSourceLine);
         tk->literal_value=token_ptr;
-        tk.literal_type=INTEGER_LIT;
-        tk.token_code=NUMBER;
+        tk->literal_type=INTEGER_LIT;
+        tk->token_code=NUMBER;
     }else if(ch=='"'){
         token_ptr=get_string(theSourceLine);
         tk->literal_value=token_ptr;
-        tk.literal_type=STRING_LIT;
-        tk.token_code=STRING;
+        tk->literal_type=STRING_LIT;
+        tk->token_code=STRING;
     }else if(ch==EOF){
-        //return something
+        tk->token_code=END_OF_FILE;
     }else{
         token_ptr=get_special(theSourceLine);
         tk->literal_value=token_ptr;
         tk->literal_type=REAL_LIT;
-        tk->token_code=tc[token_ptr];
+        if(strcmp(token_ptr, "^")){
+            tk->token_code=UPARROW;
+        }else if(strcmp(token_ptr, "*")){
+            tk->token_code=STAR;
+        }else if(strcmp(token_ptr, "(")){
+            tk->token_code=LPAREN;
+        }else if(strcmp(token_ptr, ")")){
+            tk->token_code=RPAREN;
+        }else if(strcmp(token_ptr, "-")){
+            tk->token_code=MINUS;
+        }else if(strcmp(token_ptr, "+")){
+            tk->token_code=PLUS;
+        }else if(strcmp(token_ptr, "=")){
+            tk->token_code=EQUAL;
+        }else if(strcmp(token_ptr, "[")){
+            tk->token_code=LBRACKET;
+        }else if(strcmp(token_ptr, "]")){
+            tk->token_code=RBRACKET;
+        }else if(strcmp(token_ptr, ":")){
+            tk->token_code=COLON;
+        }else if(strcmp(token_ptr, ";")){
+            tk->token_code=SEMICOLON;
+        }else if(strcmp(token_ptr, "<")){
+            tk->token_code=LT;
+        }else if(strcmp(token_ptr, ">")){
+            tk->token_code=GT;
+        }else if(strcmp(token_ptr, ",")){
+            tk->token_code=COMMA;
+        }else if(strcmp(token_ptr, ".")){
+            tk->token_code=PERIOD;
+        }else if(strcmp(token_ptr, "/")){
+            tk->token_code=SLASH;
+        }else if(strcmp(token_ptr, ":=")){
+            tk->token_code=COLONEQUAL;
+        }else if(strcmp(token_ptr, "<=")){
+            tk->token_code=LE;
+        }else if(strcmp(token_ptr, ">=")){
+            tk->token_code=GE;
+        }else if(strcmp(token_ptr, "!=")){
+            tk->token_code=NE;
+        }else if(strcmp(token_ptr, "..")){
+            tk->token_code=DOTDOT;
+        }
     }
-
-
 
     tk->next=NULL;
 
