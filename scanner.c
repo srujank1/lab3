@@ -117,7 +117,7 @@ Token* get_token()
     RwStruct w;
     //where to store the taken line
 
-    puts("ARE WE HERE?");
+
     skip_blanks(theSourceLine);
     //1.  Skip past all of the blanks
     if(strlen(theSourceLine)<=1){
@@ -139,25 +139,115 @@ Token* get_token()
     }
 
     if (isalpha(ch)) {
+
         token_ptr=get_word(theSourceLine);
         tk->literal_value=token_ptr;
-        if(is_reserved_word(token_ptr)){
-            tk->literal_type=REAL_LIT;
-            int i=0;
-            w=rw_table[strlen(token_ptr)+1][0];
-            while(w.string!=NULL){
-                if(strcmp(w.string, token_ptr)==0){
-                    w.token_code;
-                    tk->token_code=w.token_code;
-                }
+        if(strcmp(token_ptr, "program")==0){
+            tk->token_code=PROGRAM;
+        }
+        else if(strcmp(token_ptr, "const" )==0){
+            tk->token_code=CONST;
+        }
+        else if(strcmp(token_ptr, "var" )==0){
+            tk->token_code=VAR;
+        }
+        else if(strcmp(token_ptr, "begin" )==0){
+            tk->token_code=BEGIN;
+         }
+        else if(strcmp(token_ptr, "repeat" )==0){
+            tk->token_code=REPEAT;
+         }
+         else if(strcmp(token_ptr, "if" )==0){
+            tk->token_code=IF;
+         }
+         else if(strcmp(token_ptr, "then" )==0){
+            tk->token_code=THEN;
+         }
+         else if(strcmp(token_ptr, "end" )==0){
+            tk->token_code=END;
+         }
+         else if(strcmp(token_ptr, "else" )==0){
+            tk->token_code=ELSE;
+         }
+         else if(strcmp(token_ptr, "until" )==0){
+            tk->token_code=UNTIL;
+         }
+         else if(strcmp(token_ptr, "error" )==0){
+            tk->token_code=ERROR;
+         }
+         else if(strcmp(token_ptr, "do" )==0){
+            tk->token_code=DO;
+         }
+         else if(strcmp(token_ptr, "while" )==0){
+            tk->token_code=WHILE;
+         }
+         else if(strcmp(token_ptr, "with" )==0){
+            tk->token_code=WITH;
+         }
+         else if(strcmp(token_ptr, "not" )==0){
+            tk->token_code=NOT;
+         }
+        else if(strcmp(token_ptr, "to" )==0){
+            tk->token_code=TO;
+         }
+         else if(strcmp(token_ptr, "set" )==0){
+            tk->token_code=SET;
+         }
+         else if(strcmp(token_ptr, "record" )==0){
+            tk->token_code=RECORD;
+         }
+         else if(strcmp(token_ptr, "for" )==0){
+            tk->token_code=FOR;
+         }
+         else if(strcmp(token_ptr, "in" )==0){
+            tk->token_code=IN;
+         }
+         else if(strcmp(token_ptr, "goto" )==0){
+            tk->token_code=GOTO;
+         }
+         else if(strcmp(token_ptr, "div" )==0){
+            tk->token_code=DIV;
+         }
+         else if(strcmp(token_ptr, "ffile" )==0){
+            tk->token_code=FFILE;
+         }
+         else if(strcmp(token_ptr, "function" )==0){
+            tk->token_code=FUNCTION;
+         }
+         else if(strcmp(token_ptr, "and" )==0){
+            tk->token_code=AND;
+         }
+         else if(strcmp(token_ptr, "array" )==0){
+            tk->token_code=ARRAY;
+         }
+         else if(strcmp(token_ptr, "procedure" )==0){
+            tk->token_code=PROCEDURE;
+         }
+         else if(strcmp(token_ptr, "type" )==0){
+            tk->token_code=TYPE;
+         }
+         else if(strcmp(token_ptr, "packed" )==0){
+            tk->token_code=PACKED;
+         }
+         else if(strcmp(token_ptr, "or" )==0){
+            tk->token_code=OR;
+         }
+         else if(strcmp(token_ptr, "downto" )==0){
+            tk->token_code=DOWNTO;
+         }
+         else if(strcmp(token_ptr, "case" )==0){
+            tk->token_code=CASE;
+         }
+         else if(strcmp(token_ptr, "of" )==0){
+            tk->token_code=OF;
+         }
 
-            ++i;
-            w=rw_table[strlen(token_ptr)-2][i];
-            }
-        }else{
+
+        else{
             tk->literal_type=REAL_LIT;
             tk->token_code=IDENTIFIER;
         }
+
 
     }else if (isdigit(ch)) {
         token_ptr=get_number(theSourceLine);
@@ -218,9 +308,15 @@ Token* get_token()
         }else if(strcmp(token_ptr, "..")==0){
             tk->token_code=DOTDOT;
         }
+        else
+        {
+            tk->token_code=NO_TOKEN;
+        }
+
     }
 
     tk->next=NULL;
+
 
     return tk; //What should be returned here?
 }
@@ -471,4 +567,5 @@ static BOOLEAN is_reserved_word(char* sentWord)
 
     return FALSE;
 }
+
 
