@@ -14,6 +14,8 @@
 FILE *init_lister(const char *name, char source_file_name[], char dte[]);
 void quit_scanner(FILE *src_file, Token *list);
 void add_token_to_list(Token *list, Token *new_token);
+static int c;
+
 
 int main(int argc, const char * argv[])
 {
@@ -28,6 +30,7 @@ int main(int argc, const char * argv[])
 
    do
     {
+        c++;
         token = get_token();
         add_token_to_list(token_list, token);
         print_token(token);
@@ -51,9 +54,17 @@ void add_token_to_list(Token *list, Token *new_token)
     }
     else
     {
+        NEXT = list;
+        for( i= 1; i < c ; i++)
+        {
+            PREV =NEXT;
+            NEXT=NEXT->next;
+        }
 
-        new_token->next = list;
-        list = new_token;
+        PREV->next = new_token;
+
+        //new_token->next = list;
+        //list = new_token;
     }
 
 
