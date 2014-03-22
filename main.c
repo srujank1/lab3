@@ -46,6 +46,9 @@ void add_token_to_list(Token *list, Token *new_token)
 {
     // Add new_token to the list knowing that list is a linked list.
 
+    Token *NEXT, *PREV;
+    int i;
+    
     if(list == NULL)
     {
 
