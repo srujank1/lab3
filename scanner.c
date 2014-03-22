@@ -118,7 +118,7 @@ Token* get_token()
     //where to store the taken line
 
     puts("ARE WE HERE?");
-
+    skip_blanks(theSourceLine);
     //1.  Skip past all of the blanks
     if(strlen(theSourceLine)<=1){
         if(!get_source_line()){
@@ -142,7 +142,7 @@ Token* get_token()
         token_ptr=get_word(theSourceLine);
         tk->literal_value=token_ptr;
         if(is_reserved_word(token_ptr)){
-            //tk.literal_type=LiteralType
+            tk->literal_type=REAL_LIT;
             int i=0;
             w=rw_table[strlen(token_ptr)+1][0];
             while(w.string!=NULL){
@@ -155,7 +155,7 @@ Token* get_token()
             w=rw_table[strlen(token_ptr)-2][i];
             }
         }else{
-            //tk.literal_type=LiteralType.REAL_LIT;
+            tk->literal_type=REAL_LIT;
             tk->token_code=IDENTIFIER;
         }
 
@@ -175,47 +175,47 @@ Token* get_token()
         token_ptr=get_special(theSourceLine);
         tk->literal_value=token_ptr;
         tk->literal_type=REAL_LIT;
-        if(strcmp(token_ptr, "^")){
+        if(strcmp(token_ptr, "^")==0){
             tk->token_code=UPARROW;
-        }else if(strcmp(token_ptr, "*")){
+        }else if(strcmp(token_ptr, "*")==0){
             tk->token_code=STAR;
-        }else if(strcmp(token_ptr, "(")){
+        }else if(strcmp(token_ptr, "(")==0){
             tk->token_code=LPAREN;
-        }else if(strcmp(token_ptr, ")")){
+        }else if(strcmp(token_ptr, ")")==0){
             tk->token_code=RPAREN;
-        }else if(strcmp(token_ptr, "-")){
+        }else if(strcmp(token_ptr, "-")==0){
             tk->token_code=MINUS;
-        }else if(strcmp(token_ptr, "+")){
+        }else if(strcmp(token_ptr, "+")==0){
             tk->token_code=PLUS;
-        }else if(strcmp(token_ptr, "=")){
+        }else if(strcmp(token_ptr, "=")==0){
             tk->token_code=EQUAL;
-        }else if(strcmp(token_ptr, "[")){
+        }else if(strcmp(token_ptr, "[")==0){
             tk->token_code=LBRACKET;
-        }else if(strcmp(token_ptr, "]")){
+        }else if(strcmp(token_ptr, "]")==0){
             tk->token_code=RBRACKET;
-        }else if(strcmp(token_ptr, ":")){
+        }else if(strcmp(token_ptr, ":")==0){
             tk->token_code=COLON;
-        }else if(strcmp(token_ptr, ";")){
+        }else if(strcmp(token_ptr, ";")==0){
             tk->token_code=SEMICOLON;
-        }else if(strcmp(token_ptr, "<")){
+        }else if(strcmp(token_ptr, "<")==0){
             tk->token_code=LT;
-        }else if(strcmp(token_ptr, ">")){
+        }else if(strcmp(token_ptr, ">")==0){
             tk->token_code=GT;
-        }else if(strcmp(token_ptr, ",")){
+        }else if(strcmp(token_ptr, ",")==0){
             tk->token_code=COMMA;
-        }else if(strcmp(token_ptr, ".")){
+        }else if(strcmp(token_ptr, ".")==0){
             tk->token_code=PERIOD;
-        }else if(strcmp(token_ptr, "/")){
+        }else if(strcmp(token_ptr, "/")==0){
             tk->token_code=SLASH;
-        }else if(strcmp(token_ptr, ":=")){
+        }else if(strcmp(token_ptr, ":=")==0){
             tk->token_code=COLONEQUAL;
-        }else if(strcmp(token_ptr, "<=")){
+        }else if(strcmp(token_ptr, "<=")==0){
             tk->token_code=LE;
-        }else if(strcmp(token_ptr, ">=")){
+        }else if(strcmp(token_ptr, ">=")==0){
             tk->token_code=GE;
-        }else if(strcmp(token_ptr, "!=")){
+        }else if(strcmp(token_ptr, "!=")==0){
             tk->token_code=NE;
-        }else if(strcmp(token_ptr, "..")){
+        }else if(strcmp(token_ptr, "..")==0){
             tk->token_code=DOTDOT;
         }
     }
@@ -256,7 +256,7 @@ static void skip_blanks()
      Write some code to skip past the blanks in the program and return a pointer
      to the first non blank character
     */
-    while(theSourceLine[0]==' '){
+    while(theSourceLine[0]==' ' || theSourceLine[0]=='\t'){
         ++theSourceLine;
     }
 
@@ -287,7 +287,16 @@ static char* get_word()
     foundWord=(char*)malloc(index+1);
     memcpy(foundWord, theSourceLine, index);    //makes a substring from 0 to the index of the space
     foundWord[index]='\0';
-    theSourceLine=theSourceLine+index;
+
+    int i=0;
+    while(i<index){
+        if(!isdigit(foundWord[i]) && !isalpha(foundWord[i])){
+           foundWord[i]='\0';
+           i=i+index;
+        }
+        ++i;
+    }
+
 
     //Downshift the word, to make it lower case
 
@@ -296,10 +305,32 @@ static char* get_word()
     char* lower;
     lower=(char*)malloc(length+1);
     memcpy(lower, foundWord, length);    //makes a substring from 0 to the index of the space
-    lower[length]='\0';
+    /*if(isalpha(lower[length-1]) || isdigit(lower[length-1])){
+        lower[length]='\0';
+        theSourceLine=theSourceLine+length;
+        downshift_word(lower); //send foundWord to downshift_word and overwrite foundWord to the lowercase
+
+
+        //Write some code to Check if the word is a reserved word.
+        //if it is not a reserved word its an identifier.
+
+        free(foundWord);
+        return lower;
+    }
+    int i=1;
+    while(!isalpha(lower[length-i]) && !isdigit(lower[length-i])){
+        ++i;
+    }
+    lower[length-i+1]='\0';
+    */
+
+
+
+
+
 
     downshift_word(lower); //send foundWord to downshift_word and overwrite foundWord to the lowercase
-
+    theSourceLine=theSourceLine+length;
     /*
      Write some code to Check if the word is a reserved word.
      if it is not a reserved word its an identifier.
@@ -314,13 +345,29 @@ static char* get_number()
     /*
      Write some code to Extract the number and convert it to a literal number.
     */
-    char *en=strchr(theSourceLine, ' ');
+    char *en=strchrnul(theSourceLine, ' ');
     int index=(int)(en-theSourceLine);
     char *foundNum=0;    //foundWord is the extracted word
     foundNum=(char*)malloc(index+1);
     memcpy(foundNum, theSourceLine, index);    //makes a substring from 0 to the index of the space
-    foundNum[index]='\0';
-    theSourceLine=theSourceLine+index;
+
+    if(isalpha(foundNum[index-1]) || isdigit(foundNum[index-1])){
+        foundNum[index]='\0';
+        theSourceLine=theSourceLine+index;
+        downshift_word(foundNum); //send foundWord to downshift_word and overwrite foundWord to the lowercase
+
+        /*
+        Write some code to Check if the word is a reserved word.
+        if it is not a reserved word its an identifier.
+        */
+        return foundNum;
+    }
+    int i=1;
+    while(!isalpha(foundNum[index-i]) && !isdigit(foundNum[index-i])){
+        ++i;
+    }
+    foundNum[index-i]='\0';
+    theSourceLine=theSourceLine+i;
 
     return foundNum;       //return the string actually It could return d, I'm not sure
 
@@ -354,13 +401,29 @@ static char* get_special()
      Write some code to Extract the special token.  Most are single-character
      some are double-character.  Set the token appropriately.
     */
-    char *en=strchrnul(theSourceLine, ' ');
-    int index=(int)(en-theSourceLine);
+    char temp[MAX_TOKEN_STRING_LENGTH];
+    char chr=get_char();
+    while(chr=='\n' || chr=='\r'){
+        ++theSourceLine;
+        chr=get_char();
+    }
+    int i=0;
+    while(!isdigit(chr) && !isalpha(chr) && chr!=' ' && chr !='\n' && chr!='\r' && chr!='\0'){
+
+        temp[i]=chr;
+
+        ++i;
+        ++theSourceLine;
+
+        chr=get_char();
+    }
+
+
+
     char *foundWord;    //foundWord is the extracted word
-    foundWord=(char*)malloc(index+1);
-    memcpy(foundWord, theSourceLine, index);    //makes a substring from 0 to the index of the space
-    foundWord[index]='\0';
-    theSourceLine=theSourceLine+index;
+    foundWord=(char*)malloc(i+1);
+    memcpy(foundWord, temp, i);    //makes a substring from 0 to the index of the space
+    foundWord[i]='\0';
 
     return foundWord;
 }
@@ -392,15 +455,20 @@ static BOOLEAN is_reserved_word(char* sentWord)
     */
     RwStruct w;
     int i=0;
-    w=rw_table[strlen(sentWord)+1][0];
-    while(w.string!=NULL){
-        if(strcmp(w.string, sentWord)==0){
-            return TRUE;
+    if(strlen(sentWord)<=7){
+    w=rw_table[strlen(sentWord)-2][0];
+
+        while(w.string!=NULL){
+            if(strcmp(w.string, sentWord)==0){
+                return TRUE;
+            }
+
+            ++i;
+            w=rw_table[strlen(sentWord)-2][i];
         }
 
-        ++i;
-        w=rw_table[strlen(sentWord)-2][i];
     }
+
     return FALSE;
 }
 
