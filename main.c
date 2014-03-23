@@ -22,11 +22,11 @@ int main(int argc, const char * argv[])
 
 
     Token *token;
-    Token *token_list; //This needs to be implemented as a linked list in scanner.h.
+    Token *token_list = NULL; //This needs to be implemented as a linked list in scanner.h.
     char source_name[MAX_FILE_NAME_LENGTH];
     char date[DATE_STRING_LENGTH];
     FILE *source_file = init_lister(argv[1], "NEWTON.PAS", date);
-    init_scanner(source_file, source_name, date);
+    init_scanner(source_file, "NEWTON.PAS", date);
 
    do
     {
@@ -34,8 +34,10 @@ int main(int argc, const char * argv[])
         token = get_token();
         add_token_to_list(token_list, token);
         print_token(token);
+
+
     }
-    while (token != NULL);//What is the sentinal value that ends this loop?
+    while (token->token_code != END_OF_FILE);//What is the sentinal value that ends this loop?
 
     quit_scanner(source_file, token_list);
     return 0;
@@ -45,6 +47,8 @@ int main(int argc, const char * argv[])
 void add_token_to_list(Token *list, Token *new_token)
 {
     // Add new_token to the list knowing that list is a linked list.
+    Token *NEXT, *PREV;
+    int i;
 
     if(list == NULL)
     {
